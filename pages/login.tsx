@@ -2,48 +2,12 @@ import Head from "next/head";
 import Image from "next/image";
 import technopartnerLogo from "../public/img/logo technopartner.png";
 import { useAuthService } from "../core/domains/auth/useAuthService";
-import { authService } from "../core/domains/auth/auth.service";
-import { useEffect, useState } from "react";
-import { AuthResponse } from "../core/domains/auth/auth-response.type";
-import { jwt } from "../lib/jwt.helper";
-import { setCookie } from "../lib/cookie.helper";
 
 export default function LoginPage() {
-  const [credentials, setCredentials] = useState<{
-    username: string;
-    password: string;
-  }>({ username: "support@technopartner.id", password: "1234567" });
-  const [authResponse, setAuthResponse] = useState<AuthResponse>();
+  const username = "support@technopartner.id";
+  const password = "1234567";
 
-  async function login(credentials: { username: string; password: string }) {
-    const response = await authService.login(
-      credentials.username,
-      credentials.password
-    );
-    setAuthResponse(response);
-  }
-
-  useEffect(() => {
-    if (authResponse) {
-      if (authResponse.hasOwnProperty("access_token")) {
-        const { access_token } = authResponse;
-        const payload = jwt.decode(access_token) as Record<
-          string,
-          string | number
-        >;
-        const expires_in_miliseconds = (payload.exp as number) * 1000;
-        for (const [key, value] of Object.entries(authResponse)) {
-          setCookie(key, value as string, {
-            expires: expires_in_miliseconds,
-          });
-        }
-        console.log("Login success");
-        location.reload();
-      } else {
-        console.error("Login error", authResponse);
-      }
-    }
-  }, [authResponse]);
+  const { authResponse, login } = useAuthService();
 
   return (
     <>
@@ -68,7 +32,6 @@ export default function LoginPage() {
               id="login-form"
               onSubmit={event => {
                 event.preventDefault();
-                console.log("event.currentTarget", event.currentTarget);
                 const formData = new FormData(event.currentTarget);
                 const credentials = Object.fromEntries(formData.entries()) as {
                   username: string;
@@ -90,7 +53,7 @@ export default function LoginPage() {
                 name="username"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
                 placeholder="Email"
-                defaultValue={credentials.username}
+                defaultValue={username}
                 required
               />
               <label
@@ -105,7 +68,7 @@ export default function LoginPage() {
                 name="password"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Password"
-                defaultValue={credentials.password}
+                defaultValue={password}
                 required
               />
               <button
