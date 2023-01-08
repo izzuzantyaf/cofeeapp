@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
 
   if (
     Object.values(RestrictedWhenUnauthorizedRoute).includes(
-      request.nextUrl.pathname as RestrictedWhenUnauthorizedRoute
+      request.nextUrl.pathname as unknown as RestrictedWhenUnauthorizedRoute
     ) &&
     !decodedJWT
   ) {
@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   }
   if (
     Object.values(RestrictedWhenAuthorizedRoute).includes(
-      request.nextUrl.pathname as RestrictedWhenAuthorizedRoute
+      request.nextUrl.pathname as unknown as RestrictedWhenAuthorizedRoute
     ) &&
     decodedJWT
   ) {
